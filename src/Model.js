@@ -1,6 +1,7 @@
 const initModel = {
 	cards: [],
 	isAddButtonDisabled: false,
+	isNewCard: false,
 	nextId: 0,
 	// cards: [
 	// 	{

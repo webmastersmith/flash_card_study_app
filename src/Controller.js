@@ -38,11 +38,11 @@ export function scoreCard(data) {
 // R.filter(R.complement(R.propEq('id', id)))(model) // all but match
 // R.filter(R.propEq('id', id))(model) // only match
 function edit(id, model) {
-	const { cards: oldCards, nextId: oldNextId } = model
+	const { cards: oldCards, nextId: oldNextId, isNewCard } = model
 	const idx = R.findIndex(R.propEq('id', id))(oldCards)
 	const [newCard] = R.filter(R.propEq('id', id))(oldCards)
 	const newCards = R.filter(R.complement(R.propEq('id', id)))(oldCards)
-	return { idx, newCard, newCards, oldNextId }
+	return { idx, newCard, newCards, oldNextId, isNewCard }
 }
 
 function update(msg, model) {
@@ -51,7 +51,7 @@ function update(msg, model) {
 			const { card } = msg
 			const { cards: oldCards } = model
 			const cards = [card, ...oldCards]
-			return { ...model, cards, isAddButtonDisabled: true }
+			return { ...model, cards, isAddButtonDisabled: true, isNewCard: true }
 		}
 		case MSG.EDIT_CARD: {
 			const { id } = msg
@@ -76,10 +76,11 @@ function update(msg, model) {
 		}
 		case MSG.SAVE_CARD: {
 			const { id } = msg
-			const { idx, newCard, newCards, oldNextId } = edit(id, model)
+			const { idx, newCard, newCards, oldNextId, isNewCard } = edit(id, model)
 			const card = { ...newCard, editMode: false, showAnswer: false }
 			const cards = R.insert(idx, card)(newCards)
-			return { ...model, cards, nextId: oldNextId + 1, isAddButtonDisabled: false }
+			const nextId = isNewCard ? oldNextId + 1 : oldNextId
+			return { ...model, cards, nextId, isAddButtonDisabled: false, isNewCard: false }
 		}
 		case MSG.DELETE_CARD: {
 			const { id } = msg
