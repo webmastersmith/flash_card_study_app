@@ -1,13 +1,13 @@
 const initModel = {
 	// cards: [],
-	card: {},
+	isAddButtonDisabled: false,
 	nextId: 3,
 	cards: [
 		{
 			id: 0,
 			question: "What is blue?",
 			answer: "Tuesday",
-			editMode: true,
+			editMode: false,
 			showAnswer: false,
 			score: 3
 		}, {
@@ -19,7 +19,7 @@ const initModel = {
 			score: 1
 		}, {
 			id: 2,
-			question: "What is purlple?",
+			question: "What is purple?",
 			answer: "Friday",
 			editMode: false,
 			showAnswer: false,

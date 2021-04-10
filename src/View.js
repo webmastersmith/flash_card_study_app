@@ -8,14 +8,6 @@ const btnCSS = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-
 const btnDisabled = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-semibold rounded-lg shadow-md bg-${color}-300 uppercase cursor-not-allowed`
 
 // card components
-// const card = (children, data) => div({
-// 	className: `bg-yellow-200 h-96 pt-4 px-4 mr-5 mb-5 flex-33 flex flex-col`,
-// 	id: data.id,
-// 	onsubmit: e => {
-// 		e.preventDefault(),
-// 			console.log(e)
-// 	}
-// }, [...children])
 const inputBox = (labelName, cssLabel, cssTextArea, value) => div(
 	{ className: `overflow-hidden flex-40 ${cssLabel}` }, [
 	label({ className: `` }, labelName),
@@ -26,10 +18,11 @@ const inputBox = (labelName, cssLabel, cssTextArea, value) => div(
 	})
 ])
 
-const btn = (data, dispatch, model) => button({
-	className: `${btnCSS('green', 'white')}`,
-	type: 'submit',
-}, "Save"),
+const btn = (bgColor, textColor, str, data, fn) => button({
+	className: `${btnCSS(bgColor, textColor)}`,
+	type: 'button',
+	onclick: fn
+}, str)
 
 const card = (data, dispatch, model) => div({
 	className: `bg-yellow-200 h-96 pt-4 px-4 mr-5 mb-5 flex-33 flex flex-col`,
@@ -55,7 +48,7 @@ const card = (data, dispatch, model) => div({
 	// buttons
 	div(
 		{ className: `flex-20 flex items-center` }, [
-		data.editMode ? btn(data, dispatch, model) : ''
+		data.editMode ? btn('green', 'white', 'Save', data, e => console.log('hi')) : ''
 	])
 ])
 

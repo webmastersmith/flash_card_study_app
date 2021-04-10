@@ -1,13 +1,22 @@
 import * as R from 'ramda'
 const MSG = {
-	EDIT_CARD: "EDIT_CARD",
 	ADD_CARD: 'ADD_CARD',
-	SAVE_CARD: 'SAVE_CARD'
+	EDIT_QUESTION: "EDIT_QUESTION",
+	EDIT_ANSWER: "EDIT_ANSWER",
+	SAVE_CARD: 'SAVE_CARD',
+	CANCEL_CARD: 'CANCEL_CARD',
+	SHOW_ANSWER: "SHOW_ANSWER",
 }
 
-export function createCard(cardData) {
+export function addCard(card) {
 	return {
-		type: MSG.EDIT_CARD,
+		type: MSG.ADD_CARD,
+		card,
+	}
+}
+export function showAnswer(cardData) {
+	return {
+		type: MSG.SHOW_ANSWER,
 		cardData,
 	}
 }
@@ -16,16 +25,26 @@ export function createCard(cardData) {
 
 function update(msg, model) {
 	switch (msg.type) {
-		case MSG.EDIT_CARD: {
-			const { cardData: { id, question, answer, score } } = msg
+		case MSG.ADD_CARD: {
+			const { card } = msg
+			const { cards: oldCards, isAddButtonDisabled } = model
+			const cards = [card, ...oldCards]
+			console.log(cards)
+			return { ...model, cards, isAddButtonDisabled: true }
+		}
+		case MSG.EDIT_QUESTION: {
 			return { ...model }
 		}
-		case MSG.ADD_CARD: {
-			const { cardData: { id, question, answer, score } } = msg
+		case MSG.EDIT_ANSWER: {
 			return { ...model }
 		}
 		case MSG.SAVE_CARD: {
-			const { cardData: { id, question, answer, score } } = msg
+			return { ...model }
+		}
+		case MSG.CANCEL_CARD: {
+			return { ...model }
+		}
+		case MSG.SHOW_ANSWER: {
 			return { ...model }
 		}
 	}
