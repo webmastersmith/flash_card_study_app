@@ -1,54 +1,70 @@
 import hh from "hyperscript-helpers"
 import { h } from "virtual-dom"
-import { addCard, showAnswer } from "./Controller"
+import {
+	addCard,
+	editQuestion,
+	editAnswer,
+	saveCard,
+	showAnswer
+} from "./Controller"
 
 const { pre, div, h1, button, i, span, textarea, p, label } = hh(h)
 
-const btnCSS = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 bg-${color}-500 hover:bg-${color}-600 focus:ring-${color}-400 uppercase ease-in-out transition-all duration-300`
-const btnDisabled = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-semibold rounded-lg shadow-md bg-${color}-300 uppercase cursor-not-allowed`
+const btnCSS = (color = "gray", text = 'white') => `border-0 text-base py-2 px-4 text-shadow-btn text-${text} font-semibold rounded-btn shadow-btn bg-gradient-btn bg-${color}-500 hover:bg-${color}-600 uppercase active:shadow-btn-inner`
+const btnDisabled = (color = "gray", text = 'white') => `border-0 text-base py-2 px-4 text-${text} font-semibold rounded-lg shadow-btn bg-${color}-300 uppercase cursor-not-allowed`
 
 // card components
-const inputBox = (labelName, cssLabel, cssTextArea, value) => div(
+const inputBox = (labelName, cssLabel, cssTextArea, value, oninput) => div(
 	{ className: `overflow-hidden flex-40 ${cssLabel}` }, [
 	label({ className: `` }, labelName),
 	textarea({
 		className: `bg-text-white w-full h-100 ${cssTextArea}`,
 		type: 'text',
-		value
+		value,
+		oninput
 	})
 ])
 
-const btn = (bgColor, textColor, str, data, fn) => button({
+const btn = (bgColor, textColor, str, fn) => button({
 	className: `${btnCSS(bgColor, textColor)}`,
 	type: 'button',
 	onclick: fn
 }, str)
 
 const card = (data, dispatch, model) => div({
-	className: `bg-yellow-200 h-96 pt-4 px-4 mr-5 mb-5 flex-33 flex flex-col`,
+	className: `bg-yellow-200 h-96 pt-2 px-4 mr-5 mb-5 flex-33 flex flex-col`,
 	id: data.id,
-	onsubmit: e => {
-		e.preventDefault(),
-			console.log(e)
-	}
 }, [
+	div({ className: `flex` }, [
+		button({ className: `ml-auto` }, [
+			i({ className: `icon-x text-red-500` },)
+		]),
+	]),
+
+	// question
 	inputBox(
 		'Question',
 		'mb-2',
 		data.editMode ? '' : 'bg-yellow-200',
 		data.question,
-		data),
+		e => dispatch(editQuestion({ id: data.id, question: e.target.value }))
+	),
 
+	// answer
 	inputBox(
 		'Answer',
 		'mt-2',
 		data.editMode ? '' : 'bg-yellow-200',
-		data.showAnswer ? data.answer : ''),
+		data.showAnswer ? data.answer : '',
+		e => dispatch(editAnswer({ id: data.id, answer: e.target.value })),
+	),
 
 	// buttons
 	div(
 		{ className: `flex-20 flex items-center` }, [
-		data.editMode ? btn('green', 'white', 'Save', data, e => console.log('hi')) : ''
+		data.editMode
+			? btn('green', 'white', 'Save', e => dispatch(saveCard({ id: data.id, editMode: false })))
+			: ''
 	])
 ])
 
@@ -82,7 +98,7 @@ const view = (dispatch, model) => div({ className: `w-full bg-gray-100 text-blac
 					question: '',
 					answer: '',
 					editMode: true,
-					showAnswer: false,
+					showAnswer: true,
 					score: 0
 				}))
 			}, [
