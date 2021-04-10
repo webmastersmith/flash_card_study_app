@@ -1,74 +1,64 @@
 import hh from "hyperscript-helpers"
 import { h } from "virtual-dom"
-import { createCard } from "./Controller"
+import { addCard, showAnswer } from "./Controller"
 
-const { pre, div, h1, button, i, span, textarea, p, label, form } = hh(h)
+const { pre, div, h1, button, i, span, textarea, p, label } = hh(h)
 
-const btn = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 bg-${color}-500 hover:bg-${color}-600 focus:ring-${color}-400 uppercase ease-in-out transition-all duration-300`
+const btnCSS = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 bg-${color}-500 hover:bg-${color}-600 focus:ring-${color}-400 uppercase ease-in-out transition-all duration-300`
+const btnDisabled = (color = "gray", text = 'white') => `py-2 px-4 text-${text} font-semibold rounded-lg shadow-md bg-${color}-300 uppercase cursor-not-allowed`
 
 // card components
-const card = (children) => form({
-	className: `bg-yellow-200 w-80 h-96 pt-4 px-4 mr-5`,
-	onsubmit: e => {
-		e.preventDefault(),
-			console.log(e)
-	}
-},
-	[...children])
-
-// const inputBox = (data, dispatch, model) => textarea({
-// 	className: `bg-text-white w-full h-90% flex items-start`,
-// 	placeholder: data.id,
-// 	type: 'text',
-// })
-
-
-const inputBox = (labelName, cssLabel, cssTextArea = '', value = '', data, dispatch, model) => div(
-	{ className: `overflow-hidden ${cssLabel} h-40%` }, [
+// const card = (children, data) => div({
+// 	className: `bg-yellow-200 h-96 pt-4 px-4 mr-5 mb-5 flex-33 flex flex-col`,
+// 	id: data.id,
+// 	onsubmit: e => {
+// 		e.preventDefault(),
+// 			console.log(e)
+// 	}
+// }, [...children])
+const inputBox = (labelName, cssLabel, cssTextArea, value) => div(
+	{ className: `overflow-hidden flex-40 ${cssLabel}` }, [
 	label({ className: `` }, labelName),
 	textarea({
-		className: `bg-text-white w-full h-90% flex items-start ${cssTextArea}`,
+		className: `bg-text-white w-full h-100 ${cssTextArea}`,
 		type: 'text',
 		value
 	})
 ])
 
-const saveBtn = (data, dispatch, model) => div(
-	{ className: `overflow-hidden h-20% flex items-center ` }, [
-	button({
-		className: `${btn('green', 'white')}`,
-		type: 'submit',
-		onclick: e => {
-			// e.preventDefault()
-			// console.log(e)
-		}
-	}, "Save"),
+const btn = (data, dispatch, model) => button({
+	className: `${btnCSS('green', 'white')}`,
+	type: 'submit',
+}, "Save"),
+
+const card = (data, dispatch, model) => div({
+	className: `bg-yellow-200 h-96 pt-4 px-4 mr-5 mb-5 flex-33 flex flex-col`,
+	id: data.id,
+	onsubmit: e => {
+		e.preventDefault(),
+			console.log(e)
+	}
+}, [
+	inputBox(
+		'Question',
+		'mb-2',
+		data.editMode ? '' : 'bg-yellow-200',
+		data.question,
+		data),
+
+	inputBox(
+		'Answer',
+		'mt-2',
+		data.editMode ? '' : 'bg-yellow-200',
+		data.showAnswer ? data.answer : ''),
+
+	// buttons
+	div(
+		{ className: `flex-20 flex items-center` }, [
+		data.editMode ? btn(data, dispatch, model) : ''
+	])
 ])
 
-
-
-// card types
-const question = (data, dispatch, model) => [
-	inputBox(
-		'Questions',
-		'pb-4',
-		'bg-yellow-200',
-		data.question,
-		data, dispatch, model),
-
-	inputBox(
-		'Answers',
-		'pt-4',
-		'bg-yellow-200',
-		data.showAnswer ? data.answer : '',
-		data, dispatch, model),
-]
-
-const edit = (data, dispatch, model) => [
-	inputBox('Questions', 'pb-4', '', data.question, data, dispatch, model),
-	inputBox('Answers', 'pt-4', '', data.answer, data, dispatch, model),
-	saveBtn(data, dispatch, model)
-]
 
 // no cards? display starter card.
 const initial = (dispatch, model) => [
@@ -80,26 +70,37 @@ const initial = (dispatch, model) => [
 	]),
 ]
 
-// display all available cards.
-const display = (dispatch, model) => model['cards'].map(data => card(
-	data.editMode ? edit(data, dispatch, model) : question(data, dispatch, model)
-))
+// display all available cards. 
+const displayCards = (dispatch, model) => model['cards'].map(data => card(data, dispatch, model))
 
-// total page view
+// total page view !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const view = (dispatch, model) => div({ className: `w-full bg-gray-100 text-black` }, [
 	h1({ className: `text-4xl font-bold border-b-2 border-black pb-2` }, 'Flashcard Study'),
 
-	// button
+	// add flashcard button
 	div({ className: `w-100 py-5` }, [
-		button({ className: `${btn('green', 'white')}`, type: 'button' }, [
+		button(
+			{
+				className: `${model.isAddButtonDisabled ? btnDisabled() : btnCSS('green', 'white')}`,
+				type: 'button',
+				disabled: model.isAddButtonDisabled ? true : false,
+				onclick: e => dispatch(addCard({
+					id: model.nextId,
+					question: '',
+					answer: '',
+					editMode: true,
+					showAnswer: false,
+					score: 0
+				}))
+			}, [
 			i({ className: `icon-plus text-white pr-2` },),
 			span({ className: `` }, 'Add Flashcard'),
 		])
 	]),
 
 	// cards
-	div({ className: `flex flex-row -mr-5` }, [
-		model.cards.length === 0 ? card(initial(dispatch, model)) : display(dispatch, model),
+	div({ className: `grid grid-cols-3 gap-2 -mr-5` }, [
+		model.cards.length === 0 ? card(initial(dispatch, model)) : displayCards(dispatch, model),
 	]),
 
 	pre(JSON.stringify(model, null, 2))
