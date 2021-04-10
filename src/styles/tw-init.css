@@ -6,17 +6,17 @@
 @layer utilities {
   @variants responsive {
       .text-shadow {
-        text-shadow: 2px 2px 4px black;
+        text-shadow: 2px 2px 4px #000;
       }
       
       .text-shadow-btn {
-        text-shadow: 1px 1px 1px black;      }
+        text-shadow: 1px 1px 1px #000;      }
 
       .text-shadow-md {
-        text-shadow: 4px 4px 8px black;
+        text-shadow: 4px 4px 8px #000;
       }
       .text-shadow-lg {
-        text-shadow: 15px 15px 30px black;
+        text-shadow: 15px 15px 30px #000;
       }
       .text-shadow-none {
         text-shadow: none;
